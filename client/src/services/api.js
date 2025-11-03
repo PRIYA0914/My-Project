@@ -1,43 +1,39 @@
 import axios from 'axios';
 
-const API_URL = 'http://localhost:5000/api'; // Update with your backend API URL
+const API_BASE_URL = 'http://localhost:5000/api';
 
-// Function to get all users
+const api = axios.create({
+  baseURL: API_BASE_URL,
+  headers: {
+    'Content-Type': 'application/json'
+  }
+});
+
+export const complaintService = {
+  submitComplaint: async (complaintData) => {
+    try {
+      const response = await api.post('/complaints', complaintData);
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || error.message;
+    }
+  },
+
+  trackComplaint: async (complaintId) => {
+    try {
+      const response = await api.get(`/complaints/${complaintId}/status`);
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || error.message;
+    }
+  }
+};
+
 export const getUsers = async () => {
-    try {
-        const response = await axios.get(`${API_URL}/users`);
-        return response.data;
-    } catch (error) {
-        throw error;
-    }
-};
-
-// Function to create a new user
-export const createUser = async (userData) => {
-    try {
-        const response = await axios.post(`${API_URL}/users`, userData);
-        return response.data;
-    } catch (error) {
-        throw error;
-    }
-};
-
-// Function to update a user
-export const updateUser = async (userId, userData) => {
-    try {
-        const response = await axios.put(`${API_URL}/users/${userId}`, userData);
-        return response.data;
-    } catch (error) {
-        throw error;
-    }
-};
-
-// Function to delete a user
-export const deleteUser = async (userId) => {
-    try {
-        const response = await axios.delete(`${API_URL}/users/${userId}`);
-        return response.data;
-    } catch (error) {
-        throw error;
-    }
+  try {
+    const response = await api.get('/users');
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || error.message;
+  }
 };

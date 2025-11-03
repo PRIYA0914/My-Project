@@ -1,0 +1,32 @@
+/* ...existing code... */
+.track-overlay{
+  position:fixed; inset:0; background:rgba(0,0,0,0.55);
+  display:flex; align-items:center; justify-content:center; z-index:1200; padding:20px;
+}
+.track-modal{
+  width:100%; max-width:520px; background:#fff; border-radius:12px; box-shadow:0 20px 60px rgba(0,0,0,0.2);
+  overflow:hidden;
+}
+.track-header{
+  display:flex; align-items:center; justify-content:space-between; padding:16px 20px;
+  background:linear-gradient(135deg,#2f2a4e,#1a1a3a); color:#fff;
+}
+.track-header h3{margin:0;font-size:1.05rem}
+.track-header .close{background:none;border:none;color:#fff;font-size:22px;cursor:pointer}
+
+.track-form{padding:18px; display:flex; flex-direction:column; gap:10px}
+.track-form label{font-weight:600;color:#374151}
+.track-input{padding:10px 12px; border-radius:8px; border:1px solid #d1d5db; font-size:0.95rem}
+
+.track-actions{display:flex; gap:10px; margin-top:6px}
+.btn-primary{background:#ff9f00; color:#111; padding:10px 14px; border-radius:8px; border:none; cursor:pointer}
+.btn-secondary{background:transparent; border:1px solid #d1d5db; padding:10px 14px; border-radius:8px; cursor:pointer}
+
+.track-error{color:#b91c1c;padding:12px 18px;border-top:1px solid #fee2e2;background:#fff7f7}
+.track-result{padding:14px 18px;border-top:1px solid #f1f5f9;background:#fff}
+.track-result .kv{display:flex;justify-content:space-between;padding:6px 0}
+.history{margin-top:8px}
+.history h4{margin:8px 0 6px 0;color:#111;font-size:0.95rem}
+.history ul{list-style:disc;padding-left:18px;color:#374151}
+.hint{color:#6b7280;font-size:0.9rem}
+/* ...existing code... */

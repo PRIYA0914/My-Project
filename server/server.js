@@ -1,59 +1,37 @@
 const express = require('express');
 const cors = require('cors');
-require('dotenv').config();
+const mongoose = require('mongoose');
 
+// Initialize express app
 const app = express();
 
-// Try multiple ports if one is busy
-const tryPorts = [process.env.PORT || 8001, 8002, 8003, 8004, 5001, 5002];
+// Set mongoose strictQuery to avoid deprecation warning
+mongoose.set('strictQuery', false);
+
+// Connect to MongoDB
+mongoose.connect('mongodb://localhost:27017/yourdbname?directConnection=true', {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+})
+.then(() => console.log('MongoDB connected'))
+.catch(err => console.error('MongoDB connection error:', err));
 
 // Middleware
 app.use(cors());
 app.use(express.json());
 
-// Basic route
-app.get('/', (req, res) => {
-    res.json({ 
-        message: 'MERN Server is running!',
-        status: 'success',
-        port: res.locals.port
-    });
+// Routes
+app.use('/api/complaints', require('./routes/complaintRoutes'));
+app.use('/api/users', require('./routes/userRoutes'));
+
+// Error handling middleware (should be after routes)
+app.use((err, req, res, next) => {
+  console.error(err.stack);
+  res.status(500).send('Something broke!');
 });
 
-// Test route
-app.get('/api/test', (req, res) => {
-    res.json({ message: 'API is working!' });
+const PORT = process.env.PORT || 5000;
+
+app.listen(PORT, () => {
+  console.log(`Server is running on port ${PORT}`);
 });
-
-// Function to try different ports
-const startServer = (ports, index = 0) => {
-    if (index >= ports.length) {
-        console.error('❌ No available ports found');
-        return;
-    }
-
-    const port = ports[index];
-    const server = app.listen(port, () => {
-        console.log(`🚀 Server is running successfully!`);
-        console.log(`📍 Local: http://localhost:${port}`);
-        console.log(`🔗 API Test: http://localhost:${port}/api/test`);
-        console.log(`Press Ctrl+C to stop the server`);
-        
-        // Store port for response
-        app.use((req, res, next) => {
-            res.locals.port = port;
-            next();
-        });
-    });
-
-    server.on('error', (err) => {
-        if (err.code === 'EADDRINUSE') {
-            console.log(`Port ${port} is busy, trying next port...`);
-            startServer(ports, index + 1);
-        } else {
-            console.error('Server error:', err);
-        }
-    });
-};
-
-startServer(tryPorts);

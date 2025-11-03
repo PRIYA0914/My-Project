@@ -1,103 +1,155 @@
-import React from 'react';
+import React, { useState } from 'react';
 import Header from '../components/Header';
+import ComplaintForm from '../components/ComplaintForm';
+import TrackStatus from '../components/TrackStatus';
+import { complaintService } from '../services/api';
 import './Home.css';
 
-const Home = () => {
-    return (
-        <div className="home">
-            <Header />
-            <main className="main-content">
-                {/* Hero Section */}
-                <div className="hero-section">
-                    <div className="container">
-                        <div className="hero-content">
-                            <div className="hero-left">
-                                <h1 className="hero-title">
-                                    AI-BASED GRIEVANCE<br />
-                                    REDRESSAL SYSTEM
-                                </h1>
-                                <p className="hero-description">
-                                    Empowering citizens with intelligent complaint management through 
-                                    artificial intelligence for faster, more efficient grievance resolution.
-                                </p>
-                                <div className="action-buttons">
-                                    <button className="btn-primary">File a Complaint</button>
-                                    <button className="btn-secondary">Track Status</button>
-                                </div>
-                            </div>
-                            <div className="hero-right">
-                                <div className="system-title">
-                                    <h2>GRIEVANCE<br />REDRESSAL SYSTEM</h2>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+export default function Home() {
+  const [isComplaintModalOpen, setIsComplaintModalOpen] = useState(false);
+  const [isTrackOpen, setIsTrackOpen] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
 
-                {/* Features Section */}
-                <div className="features-section">
-                    <div className="container">
-                        <h2 className="section-title">Why Choose Our System?</h2>
-                        <div className="features-grid">
-                            <div className="feature-card">
-                                <div className="feature-icon">🤖</div>
-                                <h3>AI-Powered Analysis</h3>
-                                <p>Advanced AI algorithms categorize and prioritize complaints for faster resolution</p>
-                            </div>
-                            <div className="feature-card">
-                                <div className="feature-icon">⚡</div>
-                                <h3>Quick Response</h3>
-                                <p>Automated acknowledgment and intelligent routing to relevant departments</p>
-                            </div>
-                            <div className="feature-card">
-                                <div className="feature-icon">📊</div>
-                                <h3>Real-time Tracking</h3>
-                                <p>Monitor your complaint status and receive updates throughout the process</p>
-                            </div>
-                            <div className="feature-card">
-                                <div className="feature-icon">🔒</div>
-                                <h3>Secure & Transparent</h3>
-                                <p>Complete data protection with transparent communication and accountability</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+  const handleOpenComplaint = () => {
+    setIsComplaintModalOpen(true);
+  };
 
-                {/* Stats Section */}
-                <div className="stats-section">
-                    <div className="container">
-                        <div className="stats-grid">
-                            <div className="stat-item">
-                                <h3>10,000+</h3>
-                                <p>Complaints Resolved</p>
-                            </div>
-                            <div className="stat-item">
-                                <h3>95%</h3>
-                                <p>Success Rate</p>
-                            </div>
-                            <div className="stat-item">
-                                <h3>24/7</h3>
-                                <p>System Availability</p>
-                            </div>
-                            <div className="stat-item">
-                                <h3>2 Days</h3>
-                                <p>Average Resolution Time</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+  const handleCloseComplaint = () => {
+    setIsComplaintModalOpen(false);
+  };
 
-                <div className="footer-banner">
-                    <div className="container">
-                        <p className="banner-text">
-                            ⚡ Smart governance begins with listening. AI transforms grievances into insights, 
-                            Ensuring accountability, speed, and trust — For a better tomorrow
-                        </p>
-                    </div>
-                </div>
-            </main>
+  const handleOpenTrack = () => {
+    setIsTrackOpen(true);
+  };
+
+  const handleCloseTrack = () => {
+    setIsTrackOpen(false);
+  };
+
+  const handleComplaintSubmit = async (complaintData) => {
+    setLoading(true);
+    setError(null);
+    
+    try {
+      const result = await complaintService.submitComplaint(complaintData);
+      alert(`Complaint submitted successfully! Your complaint ID is: ${result.complaintId}`);
+      handleCloseComplaint();
+    } catch (err) {
+      setError(err.message || 'Failed to submit complaint. Please try again.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleTrackStatus = async (complaintId) => {
+    setLoading(true);
+    setError(null);
+    
+    try {
+      const status = await complaintService.trackComplaint(complaintId);
+      return status;
+    } catch (err) {
+      setError(err.message || 'Failed to fetch complaint status. Please try again.');
+      return null;
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="home">
+      <Header />
+      
+      <div className="home-content">
+        <section className="hero-section">
+          <div className="hero-left">
+            <h1>AI-BASED GRIEVANCE REDRESSAL SYSTEM</h1>
+            <p>Empowering citizens with intelligent complaint management through artificial intelligence for faster, more efficient grievance resolution.</p>
+            <div className="hero-actions">
+              <button className="btn-primary" onClick={handleOpenComplaint}>
+                File a Complaint
+              </button>
+              <button className="btn-ghost-alt" onClick={handleOpenTrack}>
+                Track Status
+              </button>
+            </div>
+          </div>
+
+          <div className="hero-right">
+            <div className="big-text">GRIEVANCE<br/>REDRESSAL<br/>SYSTEM</div>
+          </div>
+        </section>
+
+        {/* Stats Section */}
+        <section className="stats-section">
+          <div className="stats-container">
+            <div className="stat-item">
+              <div className="stat-number">15,000+</div>
+              <div className="stat-label">Complaints Resolved</div>
+            </div>
+            <div className="stat-item">
+              <div className="stat-number">24 hrs</div>
+              <div className="stat-label">Average Response Time</div>
+            </div>
+            <div className="stat-item">
+              <div className="stat-number">95%</div>
+              <div className="stat-label">Success Rate</div>
+            </div>
+            <div className="stat-item">
+              <div className="stat-number">24/7</div>
+              <div className="stat-label">Support Available</div>
+            </div>
+          </div>
+        </section>
+
+        {/* Features Section */}
+        <section className="features-section">
+          <h2>Why Choose Our Platform?</h2>
+          <div className="features-grid">
+            <div className="feature-card">
+              <div className="feature-icon">🤖</div>
+              <h3>AI-Powered Analysis</h3>
+              <p>Advanced AI algorithms analyze and categorize complaints for faster resolution.</p>
+            </div>
+            <div className="feature-card">
+              <div className="feature-icon">🔒</div>
+              <h3>Secure & Confidential</h3>
+              <p>Your data is protected with end-to-end encryption and strict privacy protocols.</p>
+            </div>
+            <div className="feature-card">
+              <div className="feature-icon">📱</div>
+              <h3>Real-time Tracking</h3>
+              <p>Track your complaint status in real-time with detailed progress updates.</p>
+            </div>
+            <div className="feature-card">
+              <div className="feature-icon">⚡</div>
+              <h3>Quick Resolution</h3>
+              <p>Streamlined process ensures faster complaint resolution and response times.</p>
+            </div>
+          </div>
+        </section>
+      </div>
+
+      {error && (
+        <div className="error-toast">
+          {error}
+          <button onClick={() => setError(null)}>&times;</button>
         </div>
-    );
-};
+      )}
 
-export default Home;
+      <ComplaintForm
+        isOpen={isComplaintModalOpen}
+        onClose={handleCloseComplaint}
+        onSubmit={handleComplaintSubmit}
+        isLoading={loading}
+      />
+      <TrackStatus 
+        isOpen={isTrackOpen}
+        onClose={handleCloseTrack}
+        onTrack={handleTrackStatus}
+        isLoading={loading}
+      />
+    </div>
+  );
+}

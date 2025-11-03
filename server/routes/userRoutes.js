@@ -1,20 +1,40 @@
 const express = require('express');
 const router = express.Router();
-const userController = require('../controllers/userController');
+const User = require('../models/user');
+const bcrypt = require('bcryptjs');
 
-// Route to create a new user
-router.post('/', userController.createUser);
+// Register
+router.post('/register', async (req, res) => {
+  try {
+    const { username, password } = req.body;
+    const hashedPassword = await bcrypt.hash(password, 10);
+    const user = new User({ username, password: hashedPassword });
+    await user.save();
+    res.status(201).json({ message: 'User registered' });
+  } catch (err) {
+    res.status(400).json({ error: err.message });
+  }
+});
 
-// Route to get all users
-router.get('/', userController.getAllUsers);
+// Login
+router.post('/login', async (req, res) => {
+  try {
+    const { username, password } = req.body;
+    const user = await User.findOne({ username });
+    if (!user) {
+      return res.status(401).json({ message: 'Invalid credentials' });
+    }
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) {
+      return res.status(401).json({ message: 'Invalid credentials' });
+    }
+    res.json({ message: 'Login successful' });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
 
-// Route to get a user by ID
-router.get('/:id', userController.getUserById);
-
-// Route to update a user by ID
-router.put('/:id', userController.updateUserById);
-
-// Route to delete a user by ID
-router.delete('/:id', userController.deleteUserById);
+app.use('/api/complaints', require('./routes/complaintRoutes'));
+app.use('/api/users', require('./routes/userRoutes'));
 
 module.exports = router;
